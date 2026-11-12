@@ -1,26 +1,200 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+   Design tokens
+   Dark is the default and the design target. Light is an explicit opt-in set
+   through [data-theme="light"] (see components/theme-toggle.tsx).
+--------------------------------------------------------------------------- */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+
+  --canvas: #0e0d0b;
+  --surface: #151310;
+  --surface-raised: #1c1916;
+  --line: rgba(255, 246, 235, 0.1);
+  --line-strong: rgba(255, 246, 235, 0.2);
+  --ink: #f2ede4;
+  --ink-muted: #b0a99e;
+  --ink-faint: #8b857a;
+  --accent: #e6a95f;
+  --accent-contrast: #20150a;
+  --accent-soft: rgba(230, 169, 95, 0.14);
+  --dot: rgba(255, 246, 235, 0.07);
+  --hero-glow: rgba(230, 169, 95, 0.08);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --canvas: #f8f5ef;
+  --surface: #fffdf8;
+  --surface-raised: #f0ebe1;
+  --line: rgba(30, 26, 20, 0.12);
+  --line-strong: rgba(30, 26, 20, 0.24);
+  --ink: #16140f;
+  --ink-muted: #544f46;
+  --ink-faint: #736d63;
+  --accent: #a2601c;
+  --accent-contrast: #fff8ec;
+  --accent-soft: rgba(162, 96, 28, 0.1);
+  --dot: rgba(22, 20, 15, 0.1);
+  --hero-glow: rgba(162, 96, 28, 0.06);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-accent: var(--accent);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-accent-soft: var(--accent-soft);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    background-color: var(--canvas);
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--accent-contrast);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /*
+   * Hero texture: faint dotted paper, a warm glow behind the headline, and a
+   * fade into the page background towards the bottom of the section.
+   *
+   * Implemented as stacked background layers on the section itself — no mask,
+   * no pseudo-element, no stacking context. The first layer is a gradient *to*
+   * the canvas colour, so the dots and glow dissolve into the page instead of
+   * being masked out.
+   *
+   * This is deliberate. An earlier version put `mask-image` on the section,
+   * which masked every child: the headline faded out mid-sentence and all the
+   * copy below it went invisible. A background can only ever paint *behind*
+   * content, so this version cannot hide the hero no matter what.
+   */
+  .hero-grid {
+    background-image:
+      linear-gradient(to bottom, transparent 40%, var(--canvas) 100%),
+      radial-gradient(circle at 1px 1px, var(--dot) 1px, transparent 0),
+      radial-gradient(ellipse 55% 65% at 6% 0%, var(--hero-glow), transparent 70%);
+    background-size:
+      100% 100%,
+      26px 26px,
+      100% 100%;
+  }
+
+  .link-underline {
+    text-decoration-line: underline;
+    text-decoration-color: var(--line-strong);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    transition:
+      color 200ms ease,
+      text-decoration-color 200ms ease;
+  }
+
+  .link-underline:hover {
+    color: var(--accent);
+    text-decoration-color: var(--accent);
+  }
+
+  /* Small editorial annotations — italic serif, slightly off-axis. */
+  .handwritten {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--ink-faint);
+    letter-spacing: 0.01em;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  .animate-rise {
+    animation: rise 700ms cubic-bezier(0.22, 0.68, 0.24, 1) both;
+  }
+}
+
+/*
+ * Entrance stagger. Deliberately unlayered (and deliberately not named
+ * `delay-*`, which Tailwind already uses for transition-delay): Tailwind
+ * reorders utilities inside its layers, which put these `animation-delay`
+ * longhands *before* the `.animate-rise` shorthand and reset them to 0.
+ * Unlayered rules outrank any @layer, so the delay always wins.
+ */
+.rise-1 {
+  animation-delay: 90ms;
+}
+
+.rise-2 {
+  animation-delay: 180ms;
+}
+
+.rise-3 {
+  animation-delay: 270ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .animate-rise {
+    animation: none;
+  }
 }
