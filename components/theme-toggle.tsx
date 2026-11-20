@@ -5,7 +5,11 @@ import { useSyncExternalStore } from "react";
 type Theme = "dark" | "light";
 
 const THEME_ATTRIBUTE = "data-theme";
-const STORAGE_KEY = "mt-theme";
+/**
+ * Versioned so that changing the default doesn't get masked by a preference
+ * saved under the previous default.
+ */
+const STORAGE_KEY = "mt-theme-v2";
 
 function subscribe(onStoreChange: () => void) {
   const observer = new MutationObserver(onStoreChange);
@@ -18,33 +22,37 @@ function subscribe(onStoreChange: () => void) {
 }
 
 function getSnapshot(): Theme {
-  return document.documentElement.getAttribute(THEME_ATTRIBUTE) === "light" ? "light" : "dark";
+  return document.documentElement.getAttribute(THEME_ATTRIBUTE) === "dark" ? "dark" : "light";
 }
 
-/** Dark is the default, so the server always renders the dark state. */
+/** Light is the default, so the server always renders the light state. */
 function getServerSnapshot(): Theme {
-  return "dark";
+  return "light";
 }
 
 /**
- * Dark is the default. This toggle only ever opts *in* to light mode by writing
- * `data-theme` on <html> plus a localStorage entry that the inline script in
- * app/layout.tsx replays before first paint.
+ * Light is the default. Dark is the opt-in: this toggle writes
+ * `data-theme="dark"` on <html> (and removes it for light) plus a localStorage
+ * entry that the inline script in app/layout.tsx replays before first paint.
  *
  * The current theme is read straight from the DOM through useSyncExternalStore,
  * so there is no state syncing effect and no hydration mismatch.
  */
 export function ThemeToggle() {
   const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const isLight = theme === "light";
-  const label = isLight ? "Switch to dark theme" : "Switch to light theme";
+  const isDark = theme === "dark";
+  // The icon shows the theme you would switch *to*.
+  const label = isDark ? "Switch to light theme" : "Switch to dark theme";
 
   function toggleTheme() {
-    const next: Theme = isLight ? "dark" : "light";
-    document.documentElement.setAttribute(THEME_ATTRIBUTE, next);
+    if (isDark) {
+      document.documentElement.removeAttribute(THEME_ATTRIBUTE);
+    } else {
+      document.documentElement.setAttribute(THEME_ATTRIBUTE, "dark");
+    }
 
     try {
-      window.localStorage.setItem(STORAGE_KEY, next);
+      window.localStorage.setItem(STORAGE_KEY, isDark ? "light" : "dark");
     } catch {
       // Storage can be blocked (private browsing); the toggle still works for the session.
     }
@@ -54,13 +62,12 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggleTheme}
-      aria-pressed={isLight}
       aria-label={label}
       title={label}
       className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line text-ink-muted transition-colors hover:border-line-strong hover:text-ink"
     >
       <span aria-hidden="true" className="block">
-        {isLight ? <MoonIcon /> : <SunIcon />}
+        {isDark ? <SunIcon /> : <MoonIcon />}
       </span>
     </button>
   );

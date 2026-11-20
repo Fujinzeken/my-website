@@ -1,4 +1,4 @@
-import type { NavItem, SocialLink } from "./types";
+import type { NavItem, Portrait, SocialLink } from "./types";
 
 /**
  * Single source of truth for the site's identity and positioning copy.
@@ -23,6 +23,18 @@ export const site = {
   supporting:
     "I work with founders to turn ideas into software, make existing products better, and put AI to practical use.",
   capabilities: ["Product engineering", "AI engineering", "Growth systems"],
+
+  /**
+   * Hero portrait. Lives in /public; dimensions are the real pixel size so the
+   * space is reserved before load. Set to `null` for the text-only hero.
+   */
+  portrait: {
+    src: "/hero.png",
+    alt: "Portrait of Micheal Tijani",
+    caption: "Lagos, Nigeria",
+    width: 1216,
+    height: 1294,
+  } as Portrait | null,
 
   /**
    * Primary contact. Drives the header button, the hero link, and the contact

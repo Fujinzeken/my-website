@@ -2,29 +2,14 @@
 
 /* ---------------------------------------------------------------------------
    Design tokens
-   Dark is the default and the design target. Light is an explicit opt-in set
-   through [data-theme="light"] (see components/theme-toggle.tsx).
+   Light is the default. Dark is an explicit opt-in set through
+   [data-theme="dark"] (see components/theme-toggle.tsx).
+
+   Both palettes are hand-tuned rather than inverted from each other: warm paper
+   in light, warm charcoal in dark, with the same amber accent family.
 --------------------------------------------------------------------------- */
 
 :root {
-  color-scheme: dark;
-
-  --canvas: #0e0d0b;
-  --surface: #151310;
-  --surface-raised: #1c1916;
-  --line: rgba(255, 246, 235, 0.1);
-  --line-strong: rgba(255, 246, 235, 0.2);
-  --ink: #f2ede4;
-  --ink-muted: #b0a99e;
-  --ink-faint: #8b857a;
-  --accent: #e6a95f;
-  --accent-contrast: #20150a;
-  --accent-soft: rgba(230, 169, 95, 0.14);
-  --dot: rgba(255, 246, 235, 0.07);
-  --hero-glow: rgba(230, 169, 95, 0.08);
-}
-
-[data-theme="light"] {
   color-scheme: light;
 
   --canvas: #f8f5ef;
@@ -40,6 +25,24 @@
   --accent-soft: rgba(162, 96, 28, 0.1);
   --dot: rgba(22, 20, 15, 0.1);
   --hero-glow: rgba(162, 96, 28, 0.06);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --canvas: #0e0d0b;
+  --surface: #151310;
+  --surface-raised: #1c1916;
+  --line: rgba(255, 246, 235, 0.1);
+  --line-strong: rgba(255, 246, 235, 0.2);
+  --ink: #f2ede4;
+  --ink-muted: #b0a99e;
+  --ink-faint: #8b857a;
+  --accent: #e6a95f;
+  --accent-contrast: #20150a;
+  --accent-soft: rgba(230, 169, 95, 0.14);
+  --dot: rgba(255, 246, 235, 0.07);
+  --hero-glow: rgba(230, 169, 95, 0.08);
 }
 
 @theme inline {

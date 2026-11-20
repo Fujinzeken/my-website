@@ -54,13 +54,13 @@ export const metadata: Metadata = {
 };
 
 /**
- * Runs before first paint so a saved light-mode choice never flashes dark.
+ * Runs before first paint so a saved dark-mode choice never flashes light.
  * A plain inline <script> in <head> executes synchronously during parsing, which
  * `next/script`'s beforeInteractive queue does not guarantee for inline code.
- * Dark stays the default: no attribute means "use the dark tokens".
+ * Light stays the default: no attribute means "use the light tokens".
  */
 const themeScript =
-  'try{var t=localStorage.getItem("mt-theme");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t)}}catch(e){}';
+  'try{if(localStorage.getItem("mt-theme-v2")==="dark"){document.documentElement.setAttribute("data-theme","dark")}}catch(e){}';
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { ProjectEntry } from "@/components/project-entry";
 import { Section } from "@/components/section";
 import { SiteFooter } from "@/components/site-footer";
@@ -7,7 +8,7 @@ import { WritingEntry } from "@/components/writing-entry";
 import { currently, currentlyUpdated } from "@/content/currently";
 import { lab } from "@/content/lab";
 import { featuredProjects } from "@/content/projects";
-import { contactHref, hasDirectContact, nav, site } from "@/content/site";
+import { contactHref, hasDirectContact, site } from "@/content/site";
 import { notes, writingIntro } from "@/content/writing";
 
 export default function HomePage() {
@@ -30,7 +31,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="mt-12 grid gap-12 sm:mt-14 lg:grid-cols-[minmax(0,1fr)_13rem] lg:gap-16">
+            <div className="mt-12 grid gap-12 sm:mt-14 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-16">
               <div>
                 <h1
                   id="intro-heading"
@@ -73,38 +74,30 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* A table of contents for the page, so the first screen has shape. */}
-              <aside aria-label="On this page" className="animate-rise rise-2 hidden lg:block">
-                <p className="font-mono text-[0.5625rem] uppercase tracking-[0.22em] text-ink-faint">
-                  Index
-                </p>
-                <ul className="mt-3">
-                  {nav.map((item, index) => (
-                    <li key={item.href} className="border-t border-line">
-                      <a href={item.href} className="group flex items-baseline gap-3 py-2.5">
-                        <span
-                          aria-hidden="true"
-                          className="font-mono text-[0.5625rem] tracking-[0.16em] text-ink-faint"
-                        >
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
-                        <span className="font-serif text-[1.0625rem] leading-none text-ink-muted transition-colors group-hover:text-accent">
-                          {item.label}
-                        </span>
-                        <span
-                          aria-hidden="true"
-                          className="ml-auto text-[0.6875rem] text-accent opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-                        >
-                          ↓
-                        </span>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-                <p className="handwritten mt-5 text-right text-[0.9375rem] leading-snug">
-                  A working notebook, not a portfolio.
-                </p>
-              </aside>
+              {/*
+                Portrait. A bright outdoor shot, so it gets a hairline frame and
+                a soft shadow to sit properly on the dark canvas. `sizes` keeps
+                the browser from downloading a 20rem-wide image for a phone.
+              */}
+              {site.portrait ? (
+                <figure className="animate-rise rise-2 max-w-sm lg:mt-1 lg:max-w-none">
+                  <div className="overflow-hidden rounded-lg border border-line-strong bg-surface-raised shadow-[0_28px_64px_-40px_rgba(0,0,0,0.95)]">
+                    <Image
+                      src={site.portrait.src}
+                      alt={site.portrait.alt}
+                      width={site.portrait.width}
+                      height={site.portrait.height}
+                      priority
+                      sizes="(min-width: 1024px) 20rem, (min-width: 640px) 24rem, 100vw"
+                      className="h-auto w-full"
+                    />
+                  </div>
+                  <figcaption className="mt-3 flex items-center gap-2.5 font-mono text-[0.5625rem] uppercase tracking-[0.18em] text-ink-faint">
+                    <span aria-hidden="true" className="h-px w-5 bg-line-strong" />
+                    {site.portrait.caption}
+                  </figcaption>
+                </figure>
+              ) : null}
             </div>
           </div>
         </section>

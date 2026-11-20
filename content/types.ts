@@ -53,6 +53,16 @@ export type CurrentlyItem = {
   value: string;
 };
 
+export type Portrait = {
+  /** Path inside /public. */
+  src: string;
+  alt: string;
+  /** Small mono caption under the image. */
+  caption: string;
+  width: number;
+  height: number;
+};
+
 export type LabItem = {
   name: string;
   status: string;
